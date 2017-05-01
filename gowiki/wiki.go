@@ -18,22 +18,29 @@ func (p *Page) save() error {
 
 func loadPage(title string) (*Page, error) {
 	filename := title + ".txt"
-	body, error := ioutil.ReadFile(filename)
-	if (error != nil) {
-		return nil, error
+	body, err := ioutil.ReadFile(filename)
+	if (err != nil) {
+		return nil, err
 	}
 	return &Page{Title: title, Body: body}, nil
 }
 
 func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
-	t, _ := template.ParseFiles(tmpl + ".html")
-	t.Execute(w, p)
+	t, err := template.ParseFiles(tmpl + ".html")
+	if (err != nil) {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	err = t.Execute(w, p)
+	if (err != nil) {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func viewHandler(w http.ResponseWriter, r *http.Request) {
 	title := r.URL.Path[len("/view/"):]
-	p, error := loadPage(title)
-	if (error != nil) {
+	p, err := loadPage(title)
+	if (err != nil) {
 		http.Redirect(w, r, "/edit/"+title, http.StatusFound)
 		return
 	}
@@ -53,7 +60,10 @@ func saveHandler(w http.ResponseWriter, r *http.Request) {
 	title := r.URL.Path[len("/save/"):]
 	body := r.FormValue("body")
 	p := &Page{Title: title, Body: []byte(body)}
-	p.save()
+	err := p.save()
+	if (err != nil) {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 	http.Redirect(w, r, "/view/"+title, http.StatusFound)
 }
 
