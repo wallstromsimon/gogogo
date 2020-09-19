@@ -1,6 +1,9 @@
 # gowiki
 This is an implementation of gowiki from https://golang.org/doc/articles/wiki/ to learn some go.
 
+## Check you code
+Run `go fmt ./... && golint ./... && go vet ./...` before committing.
+
 ## Build and run in docker 
 Build and start the app, the volume wiki_data is used to save wiki pages.
 
