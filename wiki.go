@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"regexp"
 )
 
@@ -13,7 +14,11 @@ type page struct {
 }
 
 func (p *page) save() error {
-	filename := "wiki_data/" + p.Title + ".txt"
+	path := "wiki_data"
+	// Make sure that wiki_data fir exists
+	_ = os.Mkdir(path, os.ModePerm)
+
+	filename := path + "/" + p.Title + ".txt"
 	return ioutil.WriteFile(filename, p.Body, 0600)
 }
 
